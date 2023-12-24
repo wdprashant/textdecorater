@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .main {
+            max-width: 100%;
+            margin: auto;
+            padding: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            background-color: rgb(81, 58, 58);
+            color: white;
+        }
+
+        .btn {
+            background-color: rgb(181, 184, 177);
+            width: 100%;
+            font-size: 14px;
+            border-radius: 18px;
+            margin-top: 10px;
+        }
+
+        .preview-counter {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .preview {
+            font-size: 18px;
+        }
+
+        .preview-btn {
+            height: 30px;
+            width: auto;
+            background-color: rgb(23, 22, 22);
+            border-radius: 10px;
+            padding: 5px 10px;
+
+            color: white;
+            outline: none;
+            border: none;
+            margin: 10px 10px;
+        }
+
+
+        @media (min-width: 768px) {
+            .main {
+                max-width: 800px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .main {
+                max-width: 1000px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="text-align:center; color: yellowgreen;">Text Editor</h1>
+    <div class="main">
+        <div class="form-group">
+            <textarea id="text-select" cols="60" rows="10" class="form-control bg-dark text-light"
+                onkeyup="updatePreview()"></textarea>
+            <div class="row">
+                <div class="col-md-2">
+                    <input type="button" class="btn" onclick="toLowerCase()" value="LowerCase" id="LowerCase" />
+                </div>
+                <div class="col-md-2">
+                    <input type="button" class="btn" onclick="toUpperCase()" value="UpperCase" />
+                </div>
+                <div class="col-md-2">
+                    <input type="button" class="btn" onclick="capitalizeText()" value="Capitalize" />
+                </div>
+                <div class="col-md-2">
+                    <input type="button" class="btn" onclick="capitalizeAfterFullStop()"
+                        value="capitalafterFullstop " />
+                </div>
+                <div class="col-md-2">
+                    <input type="button" class="btn" onclick="resetText()" value="Reset"
+                        style="background-color: red; color: aliceblue;" />
+                </div>
+
+            </div>
+        </div>
+        <br>
+        <div class="preview-counter">
+            <h5>Words - <span>0</span></h5>
+            <h5>Characters - <span>0</span></h5>
+        </div>
+        <div class="preview-box" style="display: flex;">
+
+            <h4 class="preview-indicator" style="margin-top: 10px;">Preview &#8595</h4>
+            <input type="button" value="Copy" class="preview-btn" id="copy" onclick="copyToClipboard()">
+            <input type="button" value="Download" class="preview-btn" id="download" onclick="downloadPreview()">
+        </div>
+        <p class="preview" id="preview"></p>
+    </div>
+
+    <script>
+        function updatePreview() {
+            const inputField = document.getElementById("text-select");
+            const preview = document.getElementById("preview");
+
+            const inputText = inputField.value;
+            preview.innerText = inputText;
+            const words = inputText.trim().split(/\s+/).filter(word => word !== '').length;
+
+            // Update character count (excluding spaces)
+            const characters = inputText.replace(/\s+/g, '').length;
+
+            const wordCountSpan = document.querySelector(".preview-counter h5:first-child span");
+            const charCountSpan = document.querySelector(".preview-counter h5:nth-child(2) span");
+
+            wordCountSpan.textContent = words;
+            charCountSpan.textContent = characters;
+        }
+
+        function toLowerCase() {
+            const inputField = document.getElementById("text-select");
+            inputField.value = inputField.value.toLowerCase();
+            updatePreview();
+        }
+
+        function toUpperCase() {
+            const inputField = document.getElementById("text-select");
+            inputField.value = inputField.value.toUpperCase();
+            updatePreview();
+        }
+
+        function capitalizeText() {
+            const inputField = document.getElementById("text-select");
+            const text = inputField.value;
+            const words = text.split(" ");
+            const capitalizedWords = words.map(word => {
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            });
+            inputField.value = capitalizedWords.join(" ");
+            updatePreview();
+        }
+
+        function resetText() {
+            const inputField = document.getElementById("text-select");
+            inputField.value = "";
+            updatePreview();
+        }
+        function capitalizeAfterFullStop() {
+            const inputField = document.getElementById("text-select");
+            const preview = document.getElementById("preview");
+
+            const inputText = inputField.value;
+
+            // Use regular expression to split the text into sentences
+            const sentences = inputText.split(/\. /);
+
+            // Capitalize the first letter of each sentence
+            const capitalizedSentences = sentences.map(sentence => {
+                if (sentence.length > 0) {
+                    return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+                }
+                return sentence; // Preserve empty sentences
+            });
+
+            // Join the sentences back together with full stops and a space
+            const capitalizedText = capitalizedSentences.join('. ');
+
+            // Update the textarea with the capitalized text
+            inputField.value = capitalizedText;
+
+            // Update the preview with the capitalized text
+            preview.textContent = capitalizedText;
+        }
+
+
+
+        function copyToClipboard() {
+            const preview = document.getElementById("preview");
+            const textToCopy = preview.textContent;
+            const copybtn = document.getElementById("copy")
+
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+
+            tempTextArea.select();
+            document.execCommand("copy");
+
+            document.body.removeChild(tempTextArea);
+            setTimeout(() => {
+                alert("copied to clipboard")
+            },);
+
+        }
+        function downloadPreview() {
+            const preview = document.getElementById("preview");
+            const textToDownload = preview.textContent;
+
+            // Create a Blob containing the text data
+            const blob = new Blob([textToDownload], { type: "text/plain" });
+
+            // Create a temporary URL for the Blob
+            const url = window.URL.createObjectURL(blob);
+
+            // Create a download link
+            const downloadLink = document.createElement("a");
+            downloadLink.href = url;
+            downloadLink.download = "preview.txt"; // Specify the filename here
+
+            // Simulate a click on the download link
+            downloadLink.click();
+
+            // Clean up by revoking the URL object
+            window.URL.revokeObjectURL(url);
+        }
+
+
+
+    </script>
+</body>
+
+</html>
